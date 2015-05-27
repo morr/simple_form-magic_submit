@@ -64,6 +64,7 @@ module SimpleForm
           default: [
             :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
             :"simple_form.magic_submit.#{object_scope}.#{lookup_action}.#{key}",
+            :"simple_form.magic_submit.#{object_scope}.#{key}",
             :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
             :"helpers.submit.#{lookup_action}"
           ],
