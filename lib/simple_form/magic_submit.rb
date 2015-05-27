@@ -33,6 +33,10 @@ module SimpleForm
       template.controller.respond_to?(:devise_controller?) && template.controller.devise_controller?
     end
 
+    def got_errors?
+      object.errors.count > 0 || template.flash['alert'].present?
+    end
+
     def main_class(options = {})
       options.fetch(:destructive, false) ? 'btn-destructive' : 'btn-primary'
     end
@@ -54,7 +58,7 @@ module SimpleForm
     def translate_key(key = nil)
 
       if bound_to_model?
-        key ||= self.object.errors.count > 0 ? :retry : :submit
+        key ||= got_errors? ? :retry : :submit
 
         I18n.t("simple_form.magic_submit.#{controller_scope}.#{object_scope}.#{lookup_action}.#{key}",
           default: [
