@@ -66,6 +66,7 @@ module SimpleForm
             :"simple_form.magic_submit.#{object_scope}.#{lookup_action}.#{key}",
             :"simple_form.magic_submit.#{object_scope}.#{key}",
             :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
+            :"simple_form.magic_submit.default.#{key}",
             :"helpers.submit.#{lookup_action}"
           ],
           model: self.object.class.model_name.human.titlecase
@@ -77,6 +78,7 @@ module SimpleForm
           default: [
             :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
             :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
+            :"simple_form.magic_submit.default.#{key}",
             :"helpers.submit.#{lookup_action}"
         ]).html_safe
       end
