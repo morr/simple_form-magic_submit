@@ -42,9 +42,6 @@ module SimpleForm
     end
 
     def controller_scope
-      # falls to default if the model isn't tied to a model
-      return "default" unless bound_to_model?
-
       template.controller.params[:controller].gsub('/', '.')
     end
 
