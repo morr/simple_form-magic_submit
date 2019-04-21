@@ -10,6 +10,7 @@ module SimpleForm
       options[:class] = [main_class(options), 'btn-submit', options[:class]].compact
       options[:id] ||= "submit_#{object_scope}"
       options[:autocomplete] ||= :off
+      options[:tabindex] ||= 0
       args << options
       if cancel = options.delete(:cancel)
         I18n.t("simple_form.magic_submit.cancel.format",
