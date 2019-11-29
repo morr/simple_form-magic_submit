@@ -24,7 +24,7 @@ module SimpleForm
   private
 
     def submit_title(options, key=nil)
-      if title = options.delete[:submit_title]
+      if title = options.delete(:submit_title)
         title
       else
         translate_key(key)
