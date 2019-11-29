@@ -13,15 +13,23 @@ module SimpleForm
       args << options
       if cancel = options.delete(:cancel)
         I18n.t("simple_form.magic_submit.cancel.format",
-          submit_button: submit(translate_key, *args, &block).html_safe,
+          submit_button: submit(submit_title(options), *args, &block).html_safe,
           cancel_link: template.link_to(I18n.t('simple_form.magic_submit.cancel.cancel').html_safe, cancel)
         )
       else
-        submit(translate_key, *args, &block)
+        submit(submit_title(options), *args, &block)
       end.html_safe
     end
 
   private
+
+    def submit_title(options, key=nil)
+      if title = options.delete[:submit_title]
+        title
+      else
+        translate_key(key)
+      end
+    end
 
     def bound_to_model?
       #  if its a string means that its bound to a model.. but if its a symbol its not...
