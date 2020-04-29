@@ -7,7 +7,11 @@ module SimpleForm
       options = args.extract_options!
       options[:data] ||= {}
       options[:data][:disable_with] ||= translate_key(:disable_with)
-      options[:class] = [main_class(options), 'btn-submit', options[:class]].compact
+      options[:class] = if options.delete(:overwrite_default_classes)
+                          [options[:class]]
+                        else
+                          [main_class(options), 'btn-submit', options[:class]].compact
+                        end
       options[:id] ||= "submit_#{object_scope}"
       options[:autocomplete] ||= :off
       args << options
