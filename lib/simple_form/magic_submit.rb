@@ -58,31 +58,37 @@ module SimpleForm
       self.object.class.model_name.i18n_key.to_s
     end
 
-    def translate_key(key = nil)
+    def translated_model_name
+      return self.object.class.model_name.human.titlecase if bound_to_model?
 
+      I18n.t("activerecord.models.#{self.object_name.to_s.singularize}.one", default: self.object_name.to_s.humanize)
+    end
+
+    def translate_key(key = nil)
       if bound_to_model?
         key ||= self.object.errors.count > 0 ? :retry : :submit
 
         I18n.t("simple_form.magic_submit.#{controller_scope}.#{object_scope}.#{lookup_action}.#{key}",
-          default: [
-            :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
-            :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
-            :"helpers.submit.#{lookup_action}"
-          ],
-          model: self.object.class.model_name.human.titlecase
+               default: [
+                 :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
+                 :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
+                 :"helpers.submit.#{lookup_action}"
+               ],
+               model: translated_model_name
         ).html_safe
       else
         # we have no model errors... so we test if the post is get or already posted
         key ||= template.request.get? ? :submit : :retry
         I18n.t("simple_form.magic_submit.#{controller_scope}.#{object_scope}.#{lookup_action}.#{key}",
-          default: [
-            :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
-            :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
-            :"helpers.submit.#{lookup_action}"
-        ]).html_safe
+               default: [
+                 :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
+                 :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
+                 :"helpers.submit.#{lookup_action}"
+               ],
+               model: translated_model_name
+        ).html_safe
       end
     end
-
   end
 end
 
