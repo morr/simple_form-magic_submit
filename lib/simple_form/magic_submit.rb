@@ -7,14 +7,18 @@ module SimpleForm
       options = args.extract_options!
       options[:data] ||= {}
       options[:data][:disable_with] ||= translate_key(:disable_with)
-      options[:class] = if options.delete(:overwrite_default_classes)
-                          [options[:class]]
-                        else
-                          [main_class(options), 'btn-submit', options[:class]].compact
-                        end
+      options[:class] =
+        if options.delete(:overwrite_default_classes)
+          [options[:class]]
+        else
+          [main_class(options), 'btn-submit', options[:class]].compact
+        end
       options[:id] ||= "submit_#{object_scope}"
       options[:autocomplete] ||= :off
+      options[:tabindex] ||= 0
+
       args << options
+
       if cancel = options.delete(:cancel)
         I18n.t("simple_form.magic_submit.cancel.format",
           submit_button: submit(submit_title(options), *args, &block).html_safe,
@@ -36,8 +40,17 @@ module SimpleForm
     end
 
     def bound_to_model?
+      return true if devise_controller?
       #  if its a string means that its bound to a model.. but if its a symbol its not...
       self.object_name.is_a?(String)# || self.object.present?
+    end
+
+    def devise_controller?
+      template.controller.respond_to?(:devise_controller?) && template.controller.devise_controller?
+    end
+
+    def got_errors?
+      object.errors.count > 0 || template.flash['alert'].present?
     end
 
     def main_class(options = {})
@@ -45,9 +58,6 @@ module SimpleForm
     end
 
     def controller_scope
-      # falls to default if the model isn't tied to a model
-      return "default" unless bound_to_model?
-
       template.controller.params[:controller].gsub('/', '.')
     end
 
@@ -66,26 +76,30 @@ module SimpleForm
 
     def translate_key(key = nil)
       if bound_to_model?
-        key ||= self.object.errors.count > 0 ? :retry : :submit
+        key ||= got_errors? ? :retry : :submit
 
         I18n.t("simple_form.magic_submit.#{controller_scope}.#{object_scope}.#{lookup_action}.#{key}",
-               default: [
-                 :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
-                 :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
-                 :"helpers.submit.#{lookup_action}"
-               ],
-               model: translated_model_name
+          default: [
+          :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
+          :"simple_form.magic_submit.#{object_scope}.#{lookup_action}.#{key}",
+          :"simple_form.magic_submit.#{object_scope}.#{key}",
+          :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
+          :"simple_form.magic_submit.default.#{key}",
+          :"helpers.submit.#{lookup_action}"
+          ],
+          model: translated_model_name
         ).html_safe
       else
         # we have no model errors... so we test if the post is get or already posted
         key ||= template.request.get? ? :submit : :retry
         I18n.t("simple_form.magic_submit.#{controller_scope}.#{object_scope}.#{lookup_action}.#{key}",
-               default: [
-                 :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
-                 :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
-                 :"helpers.submit.#{lookup_action}"
-               ],
-               model: translated_model_name
+          default: [
+          :"simple_form.magic_submit.#{controller_scope}.#{lookup_action}.#{key}",
+          :"simple_form.magic_submit.default.#{lookup_action}.#{key}",
+          :"simple_form.magic_submit.default.#{key}",
+          :"helpers.submit.#{lookup_action}"
+          ],
+          model: translated_model_name
         ).html_safe
       end
     end
