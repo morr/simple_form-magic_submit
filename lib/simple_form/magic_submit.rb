@@ -2,6 +2,12 @@ require 'simple_form/magic_submit/version'
 
 module SimpleForm
   module MagicSubmit
+    @uniq_id = 0
+
+    def self.uniq_id
+      @uniq_id += 1
+    end
+
     def magic_submit_button(*args, &block)
       options = args.extract_options!
       options[:data] ||= {}
@@ -12,7 +18,7 @@ module SimpleForm
         else
           [main_class(options), 'btn-submit', options[:class]].compact
         end
-      options[:id] ||= "submit_#{object_scope}"
+      options[:id] ||= "submit_#{object_scope}_#{SimpleForm::MagicSubmit.uniq_id}"
       options[:autocomplete] ||= :off
       options[:tabindex] ||= 0
 
@@ -51,7 +57,7 @@ module SimpleForm
     end
 
     def got_errors?
-      object.errors.count > 0 || template.flash['alert'].present?
+      object.errors.count.positive? || template.flash['alert'].present?
     end
 
     def main_class(options = {})
